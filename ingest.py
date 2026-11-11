@@ -5,7 +5,7 @@ from pypdf import PdfReader
 BASE = os.environ["LLM_BASE_URL"].rstrip("/")
 HEADERS = {"Authorization": f"Bearer {os.environ.get('LLM_API_KEY', '')}"}
 MODEL = "nomic-embed-text"
-CHUNK, OVERLAP = 1000, 200
+CHUNK, OVERLAP = 600,120
 
 def chunks(text):
     text = " ".join(text.split())

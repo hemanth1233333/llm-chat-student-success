@@ -20,7 +20,7 @@ async function embedQuery(q: string): Promise<number[]> {
   return v.map((x) => x / n);
 }
 
-function topK(q: number[], k = 4) {
+function topK(q: number[], k = 3) {
   return INDEX.map((c) => ({ c, score: c.embedding.reduce((a, x, i) => a + x * q[i], 0) }))
     .sort((a, b) => b.score - a.score)
     .slice(0, k);
@@ -52,7 +52,8 @@ ${context}`;
       model: process.env.LLM_MODEL,
       stream: true,
       temperature: 0.2,
-      messages: [{ role: "system", content: system }, ...messages.slice(-10)],
+      max_tokens: 300,
+      messages: [{ role: "system", content: system }, ...messages.slice(-4)],
     }),
   });
 
