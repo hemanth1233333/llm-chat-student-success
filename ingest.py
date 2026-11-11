@@ -1,4 +1,4 @@
-import json, os, sys, math, requests
+import json,re, os, sys, math, requests
 from pathlib import Path
 from pypdf import PdfReader
 from qr_test import qr_links
