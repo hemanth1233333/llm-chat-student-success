@@ -1,6 +1,7 @@
 import json, os, sys, math, requests
 from pathlib import Path
 from pypdf import PdfReader
+from qr_test import qr_links
 
 BASE = os.environ["LLM_BASE_URL"].rstrip("/")
 HEADERS = {"Authorization": f"Bearer {os.environ.get('LLM_API_KEY', '')}"}
@@ -26,8 +27,12 @@ def norm(v):
 
 records = []
 for pdf in sorted(Path("docs").glob("*.pdf")):
+    qrs = qr_links(pdf)
     for pageno, page in enumerate(PdfReader(pdf).pages, 1):
-        for c in chunks(page.extract_text() or ""):
+        text = page.extract_text() or ""
+        if pageno in qrs:
+            text += " QR code links on this page: " + ", ".join(qrs[pageno])
+        for c in chunks(text):
             if len(c) > 50:
                 records.append({"source": pdf.name, "page": pageno, "text": c})
     print(f"read {pdf.name}")
