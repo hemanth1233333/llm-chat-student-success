@@ -66,11 +66,23 @@ export default function Home() {
       });
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next }),
-      });
+            const call = (code: string) =>
+        fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-access-code": code },
+          body: JSON.stringify({ messages: next }),
+        });
+      let code = "";
+      try { code = localStorage.getItem("ss-code") ?? ""; } catch {}
+      let res = await call(code);
+      if (res.status === 401) {
+        code = window.prompt("Enter the coach access code") ?? "";
+        try { localStorage.setItem("ss-code", code); } catch {}
+        res = await call(code);
+      }
+      if (res.status === 401) { update(() => "Incorrect access code. Refresh and try again."); return; }
+      if (res.status === 429) { update(() => "You're sending messages too fast. Please wait a minute."); return; }
+      if (res.status === 413) { update(() => "That message is too long. Please keep it under 1,000 characters."); return; }
       if (!res.ok || !res.body) throw new Error(await res.text());
       const reader = res.body.getReader();
       const dec = new TextDecoder();
@@ -227,7 +239,7 @@ export default function Home() {
           <div className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-4">
             {composer}
             <p className="mt-2 text-center text-[11px] text-slate-400">
-              AI can make mistakes. Confirm important details with a Student Success coach.
+              Do not enter student names, IDs, or personal details. AI can make mistakes, so verify before referring.
             </p>
           </div>
         </>
