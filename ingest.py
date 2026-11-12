@@ -39,7 +39,7 @@ for pdf in sorted(Path("docs").glob("*.pdf")):
 
 for md in sorted(Path("docs").glob("*.md")):
     for part in re.split(r"^## ", md.read_text(), flags=re.M)[1:]:
-        text = " ".join(part.split())
+        text = part.strip()
         if len(text) > 30:
             records.append({"source": md.name, "page": None, "text": text})
     print(f"read {md.name}")
